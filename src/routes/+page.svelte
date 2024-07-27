@@ -14,17 +14,16 @@
 	} from '@sveltestrap/sveltestrap';
 
 	import { onMount } from 'svelte';
+	import { goto } from '$app/navigation';
 	import { comfyUrlWritable, pushyAppIdWritable } from '$lib/store';
-	import { get } from 'svelte/store';
 
 	onMount(() => {
-        console.log($comfyUrlWritable, $pushyAppIdWritable);
+		console.log($comfyUrlWritable, $pushyAppIdWritable);
 	});
 
 	function onStartBtn() {
-        console.log($comfyUrlWritable, $pushyAppIdWritable);
+		goto('/view')
 	}
-
 </script>
 
 <Navbar dark expand="md" container="md">
