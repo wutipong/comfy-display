@@ -10,19 +10,19 @@
 		FormGroup,
 		Input,
 		Label,
-		Container
+		Container,
+		Table,
+		Button
 	} from '@sveltestrap/sveltestrap';
 
 	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
-	import { comfyUrlWritable, pushyAppIdWritable } from '$lib/store';
+	import { comfyUrlWritable, comfyHeadersWritable, pushyAppIdWritable } from '$lib/store';
 
-	onMount(() => {
-		console.log($comfyUrlWritable, $pushyAppIdWritable);
-	});
+	onMount(() => {});
 
 	function onStartBtn() {
-		goto('/view')
+		goto('/view');
 	}
 </script>
 
@@ -42,6 +42,24 @@
 			<Label>ComfyUI URL</Label>
 			<Input type="url" placeholder="http://127.0.0.1:8188/" bind:value={$comfyUrlWritable} />
 		</FormGroup>
+		<Label>Request Headers</Label>
+		<Table>
+			<thead>
+				<th>Field</th>
+				<th>Value</th>
+				<th>Action</th>
+			</thead>
+			<tbody>
+				{#each $comfyHeadersWritable as header}
+					<tr>
+						<td><Input bind:value={header.field} /></td>
+						<td><Input bind:value={header.value} /></td>
+						<td><Button><Icon name="minus" /></Button></td>
+					</tr>
+				{/each}
+			</tbody>
+		</Table>
+		<Button><Icon name="plus"></Icon></Button>
 	</Form>
 
 	<h2>Pushy Settings</h2>
