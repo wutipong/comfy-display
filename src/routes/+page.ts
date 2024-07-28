@@ -1,15 +1,16 @@
 import { env } from '$env/dynamic/public';
 
 let obj = {};
-if(env.PUBLIC_COMFY_HEADERS !== undefined){
+if (env.PUBLIC_COMFY_HEADERS !== undefined) {
     obj = JSON.parse(env.PUBLIC_COMFY_HEADERS)
 }
 
-const comfyHeaders = new Map<string, string> ( Object.entries(obj));
+const comfyHeaders = new Map<string, string>(Object.entries(obj));
 const comfyUrl = env.PUBLIC_COMFY_URL;
 
 export interface PageData {
-    imageUrl: URL[]
+    imageUrls: URL[],
+    error?: any
 }
 
 export async function load({ fetch, params }): Promise<PageData> {
@@ -27,11 +28,21 @@ export async function load({ fetch, params }): Promise<PageData> {
 
         const data = await fetch(request)
         const obj = await data.json();
+        const keys = Object.keys(obj);
 
-        const history = obj[Object.keys(obj)[0]];
+        if (keys.length === 0) {
+            return {
+                imageUrls: []
+            };
+        }
+
+        const history = obj[keys[0]];
+
         const outputs = history["outputs"];
         if (outputs === undefined) {
-            throw new Error()
+            return {
+                imageUrls: []
+            };
         }
         const outputKeys = Object.keys(outputs);
 
@@ -43,23 +54,23 @@ export async function load({ fetch, params }): Promise<PageData> {
             }
         }
 
-        let imageUrl = [];
+        let imageUrls = [];
         for (const i of images) {
             const url = new URL('/view', comfyUrl);
             url.searchParams.append('filename', i.filename);
             url.searchParams.append('type', i.type);
             url.searchParams.append('subfolder', i.subfolder);
 
-            imageUrl.push(url);
+            imageUrls.push(url);
         }
 
         return {
-            imageUrl: imageUrl
+            imageUrls: imageUrls
         };
     } catch (e) {
-        console.log(e);
         return {
-            imageUrl: []
+            imageUrls: [],
+            error: e
         };
     }
 }
