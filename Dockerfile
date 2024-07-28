@@ -12,4 +12,4 @@ WORKDIR /app
 COPY --from=builder /app/build /app/build
 
 EXPOSE 3000
-CMD ["node", "-r", "dotenv/config", "/app/build"]
+CMD ["node", "/app/build"]

@@ -1,0 +1,19 @@
+name: portainer-notify 
+
+# Only trigger, when the build workflow succeeded
+on:
+  workflow_run:
+    workflows: ["publish-docker-image"]
+    types:
+      - completed
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: call webhook
+        uses: satak/webrequest-action@master
+        with:
+          url: ${{ secrets.PORTAINER_WEBHOOK }}
+          method: POST
