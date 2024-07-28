@@ -16,13 +16,13 @@
 	import type { PageData } from './$types';
 	import { onMount } from 'svelte';
 	import { invalidateAll } from '$app/navigation';
-	import { env } from '$env/dynamic/public';
+	import { comfyURL } from '$lib/config';
 
 	export let data: PageData;
 
 	let activeIndex = 0;
 
-	const pollInterval = 30_000;
+	const pollInterval = 15_000;
 
 	onMount(() => {
 		const interval = setInterval(() => invalidateAll(), pollInterval);
@@ -34,7 +34,7 @@
 	<NavbarBrand href="/">ComfyUI Display</NavbarBrand>
 	<Nav class="ms-auto" navbar>
 		<NavItem>
-			<NavLink href={env.PUBLIC_COMFY_URL} target="_blank">
+			<NavLink href={comfyURL} target="_blank">
 				<Icon name="robot" />
 				&nbsp;ComfyUI
 			</NavLink>

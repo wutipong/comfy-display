@@ -1,12 +1,4 @@
-import { env } from '$env/dynamic/public';
-
-let obj = {};
-if (env.PUBLIC_COMFY_HEADERS !== undefined) {
-    obj = JSON.parse(env.PUBLIC_COMFY_HEADERS)
-}
-
-const comfyHeaders = new Map<string, string>(Object.entries(obj));
-const comfyUrl = env.PUBLIC_COMFY_URL;
+import { comfyHeaders, comfyURL } from '$lib/config'
 
 export interface PageData {
     imageUrls: URL[],
@@ -14,7 +6,7 @@ export interface PageData {
 }
 
 export async function load({ fetch, params }): Promise<PageData> {
-    const historyUrl = new URL('/history', comfyUrl)
+    const historyUrl = new URL('/history', comfyURL)
     historyUrl.searchParams.append('max_items', '1');
 
     try {
@@ -56,7 +48,7 @@ export async function load({ fetch, params }): Promise<PageData> {
 
         let imageUrls = [];
         for (const i of images) {
-            const url = new URL('/view', comfyUrl);
+            const url = new URL('/view', comfyURL);
             url.searchParams.append('filename', i.filename);
             url.searchParams.append('type', i.type);
             url.searchParams.append('subfolder', i.subfolder);
