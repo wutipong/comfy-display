@@ -30,7 +30,7 @@ jobs:
         uses: docker/metadata-action@v4
         with:
           images: |
-            wutipong/watching-gallery
+            wutipong/comfy-display
           tags: |
             type=ref,event=branch
             type=ref,event=pr
