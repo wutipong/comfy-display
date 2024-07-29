@@ -1,38 +1,33 @@
-# create-svelte
+# Comfy-Display
 
-Everything you need to build a Svelte project, powered by [`create-svelte`](https://github.com/sveltejs/kit/tree/main/packages/create-svelte).
+![alt text](docs/image-1.png)
 
-## Creating a project
+A simple monitoring app that polls image from a [ComfyUI](https://github.com/comfyanonymous/ComfyUI) instance and displays the output images from the latest workflow.
 
-If you're seeing this, you've probably already done this step. Congrats!
+## Usage
 
-```bash
-# create a new project in the current directory
-npm create svelte@latest
+Run the application and browse to the web page. The application should handle all the rest.
 
-# create a new project in my-app
-npm create svelte@latest my-app
-```
+Docker image is also available at [Docker Hub](https://hub.docker.com/repository/docker/wutipong/comfy-display/general)
 
-## Developing
+## Configuration
 
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
+By default, Comfy-Display pulls images from `http://127.0.0.1:8188` which is the default URL of ComfyUI. The request will be sent with no extra fields.
 
-```bash
-npm run dev
+### PUBLIC_COMFY_URL
 
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
-```
+ To change the ComfyUI's address, set the environment `PUBLIC_COMFY_URL` to the address.
 
-## Building
+### PUBLIC_COMFY_HEADERS
 
-To create a production version of your app:
+Some instance of ComfyUI needs special HTTP headers fieds when it's setup in a specific way, eg. running behind CloudFlare Zero Access (like mine). If this is the case for your instance, set the `PUBLIC_COMFY_HEADERS` environment variable to a JSON containing a map of key-value pairs of said request.
 
-```bash
-npm run build
-```
+For example, if ComfyUI requires 2 fields on the REST API's HTTP request as following:
 
-You can preview the production build with `npm run preview`.
+| Field                   | Value                                                            |
+| ----------------------- | ---------------------------------------------------------------- |
+| CF-Access-Client-Id     | d41d8cd98f00b204e9800998ecf8427e.access                          |
+| CF-Access-Client-Secret | e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 |
 
-> To deploy your app, you may need to install an [adapter](https://kit.svelte.dev/docs/adapters) for your target environment.
+Assign the `PUBLIC_COMFY_HEADERS` variable to `
+{"CF-Access-Client-Id": "d41d8cd98f00b204e9800998ecf8427e.access", "CF-Access-Client-Secret": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"}`.
