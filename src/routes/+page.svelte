@@ -1,9 +1,6 @@
 <script lang="ts">
 	import {
-		Carousel,
-		CarouselControl,
-		CarouselIndicators,
-		CarouselItem,
+		Button,
 		Container,
 		Icon,
 		Nav,
@@ -13,22 +10,59 @@
 		NavLink
 	} from '@sveltestrap/sveltestrap';
 
-	import type { PageData } from './$types';
-	import { onMount } from 'svelte';
+	import { onMount, onDestroy } from 'svelte';
 	import { invalidateAll } from '$app/navigation';
 	import { comfyURL } from '$lib/config';
+	import { Carousel } from 'bootstrap';
+
+	import type { PageData } from './$types';
 
 	export let data: PageData;
 
 	let activeIndex = 0;
 
+	let carousel: Carousel;
+	let refreshInterval: number;
+
 	const pollInterval = 15_000;
 
-	onMount(() => {
-		const interval = setInterval(() => invalidateAll(), pollInterval);
-		return () => clearInterval(interval);
+	onMount(async () => {
+		refreshInterval = setInterval(() => invalidateAll(), pollInterval);
+
+		let carouselControl = document.querySelector('#carouselControl');
+
+		if (carouselControl) {
+			carousel = new Carousel(carouselControl, {
+				keyboard: false,
+				pause: false,
+				ride: 'carousel'
+			});
+		}
 	});
+
+	onDestroy(() => {
+		clearInterval(refreshInterval);
+	});
+
+	let pauseIcon: 'pause' | 'play' = 'pause';
+	function togglePause(e: MouseEvent): void {
+		switch (pauseIcon) {
+			case 'pause':
+				pauseIcon = 'play';
+				carousel.pause();
+				break;
+
+			case 'play':
+				pauseIcon = 'pause';
+				carousel.cycle();
+				break;
+		}
+	}
 </script>
+
+<svelte:head>
+	<title>ComfyUI Display</title>
+</svelte:head>
 
 <Navbar dark expand="md" container="md">
 	<NavbarBrand href="/">ComfyUI Display</NavbarBrand>
@@ -56,24 +90,47 @@
 
 {#if data.imageUrls.length > 0}
 	<div class="fullscreen" style="padding-top:60px;">
-		<Carousel pause={false} items={data.imageUrls} bind:activeIndex class="w-100 h-100">
-			<CarouselIndicators bind:activeIndex items={data.imageUrls} />
-			<div class="carousel-inner w-100 h-100">
-				{#each data.imageUrls as url, index}
-					<CarouselItem bind:activeIndex itemIndex={index} class="w-100 h-100">
-						<a href={url.toString()} target="_blank">
-							<img
-								src={url.toString()}
-								class="d-block h-100 ms-auto me-auto"
-								alt="img #{index + 1}"
-							/>
-						</a>
-					</CarouselItem>
+		<div class="carousel slide w-100 h-100" id="carouselControl">
+			<div class="carousel-indicators">
+				<Button on:click={togglePause}>
+					<Icon bind:name={pauseIcon}></Icon>
+				</Button>
+				{#each data.imageUrls as _, index}
+					<button
+						type="button"
+						data-bs-target="#carouselControl"
+						data-bs-slide-to={index}
+						class:active={index == activeIndex}
+						aria-current={index == activeIndex}
+						aria-label="Slide {index}"
+					></button>
 				{/each}
 			</div>
-
-			<CarouselControl direction="prev" bind:activeIndex items={data.imageUrls} />
-			<CarouselControl direction="next" bind:activeIndex items={data.imageUrls} />
-		</Carousel>
+			
+			<div class="carousel-inner w-100 h-100" id="carousel" style="width:100%; height:100%;">
+				{#each data.imageUrls as url, index}
+					<div class="carousel-item w-100 h-100" class:active={index === activeIndex}>
+						<div class="w-100 h-100 d-flex flex-col">
+							<a href={url.toString()} target="_blank">
+								<img
+									class="ms-auto me-auto w-100 h-100"
+									alt="page {index}"
+									src={url.toString()}
+									style="object-fit:contain;max-width:100%;max-height:100%"
+								/>
+							</a>
+						</div>
+					</div>
+				{/each}
+			</div>
+			<button class="carousel-control-prev" data-bs-target="#carouselControl" data-bs-slide="prev">
+				<span class="carousel-control-prev-icon" aria-hidden="true" />
+				<span class="visually-hidden">Previous</span>
+			</button>
+			<button class="carousel-control-next" data-bs-target="#carouselControl" data-bs-slide="next">
+				<span class="carousel-control-next-icon" aria-hidden="true" />
+				<span class="visually-hidden">Next</span>
+			</button>
+		</div>
 	</div>
 {/if}
