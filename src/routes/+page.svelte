@@ -13,7 +13,6 @@
 	import { onMount, onDestroy } from 'svelte';
 	import { invalidateAll } from '$app/navigation';
 	import { comfyURL } from '$lib/config';
-	import { Carousel } from 'bootstrap';
 
 	import type { PageData } from './$types';
 
@@ -21,23 +20,27 @@
 
 	let activeIndex = 0;
 
-	let carousel: Carousel;
+	let carousel: bootstrap.Carousel;
 	let refreshInterval: number;
 
 	const pollInterval = 15_000;
 
 	onMount(async () => {
+		const bootstrap = await import('bootstrap')
+
 		refreshInterval = setInterval(() => invalidateAll(), pollInterval);
 
 		let carouselControl = document.querySelector('#carouselControl');
 
 		if (carouselControl) {
-			carousel = new Carousel(carouselControl, {
+			carousel = new bootstrap.Carousel(carouselControl, {
 				keyboard: false,
 				pause: false,
 				ride: 'carousel'
 			});
 		}
+
+		console.log('mount')
 	});
 
 	onDestroy(() => {
